@@ -1,21 +1,18 @@
 pipeline {
-  agent none
-  stages {
-    stage('Back-end') {
-      agent {
-        docker { image 'maven:3.8.1-adoptopenjdk-11' }
-      }
-      steps {
-        sh 'mvn --version'
-      }
+    agent any
+
+    stages {
+        stage('Back-end') {
+            steps {
+                // Run Maven inside a Linux container, mounting the workspace
+                bat 'docker run --rm -v "%WORKSPACE%:/app" -w /app maven:3.9-eclipse-temurin-17 mvn --version'
+            }
+        }
+        stage('Front-end') {
+            steps {
+                // Run Node inside a Linux container, mounting the workspace
+                bat 'docker run --rm -v "%WORKSPACE%:/app" -w /app node:20-alpine node --version'
+            }
+        }
     }
-    stage('Front-end') {
-      agent {
-        docker { image 'node:16-alpine' }
-      }
-      steps {
-        sh 'node --version'
-      }
-    }
-  }
 }
